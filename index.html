@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Expense Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-24 lg:pb-8">
+
+  <!-- Mobile Sticky Top Header -->
+  <header class="sticky top-0 z-20 bg-slate-900 text-white p-4 shadow-md sm:hidden flex justify-between items-center">
+    <div>
+      <p class="text-xs text-slate-400 uppercase tracking-wide font-semibold">Today's Total</p>
+      <h2 id="mobileTodayTotal" class="text-xl font-bold">₹0.00</h2>
+    </div>
+    <div class="text-right">
+      <label for="mobileMonthFilter" class="block text-xs text-slate-400">Month</label>
+      <input type="month" id="mobileMonthFilter" class="bg-slate-800 border border-slate-700 text-white text-xs rounded p-1 outline-none">
+    </div>
+  </header>
+
+  <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+    <!-- Desktop Header -->
+    <header class="hidden sm:flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">Expense Tracker</h1>
+        <p class="text-sm text-slate-500">Track daily spending and monthly totals</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <label for="desktopMonthFilter" class="text-sm font-semibold text-slate-600">Month:</label>
+        <input type="month" id="desktopMonthFilter" class="border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+      </div>
+    </header>
+
+    <!-- KPI Summary Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+      <div class="hidden sm:block bg-indigo-600 text-white p-5 rounded-xl shadow-sm">
+        <p class="text-xs font-medium text-indigo-100">Today's Expenses</p>
+        <h2 id="todayTotal" class="text-2xl lg:text-3xl font-bold mt-1">₹0.00</h2>
+      </div>
+      <div class="bg-slate-900 text-white p-4 sm:p-5 rounded-xl shadow-sm col-span-1">
+        <p class="text-xs font-medium text-slate-300">Selected Month</p>
+        <h2 id="monthTotal" class="text-xl sm:text-2xl lg:text-3xl font-bold mt-1">₹0.00</h2>
+      </div>
+      <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 col-span-1">
+        <p class="text-xs font-medium text-slate-500">Total Entries</p>
+        <h2 id="totalEntries" class="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mt-1">0</h2>
+      </div>
+    </div>
+
+    <!-- Main Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Desktop Expense Form Card -->
+      <div class="hidden lg:block bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1 h-fit">
+        <h3 class="text-lg font-bold mb-4 text-slate-800">Add New Expense</h3>
+        <form id="desktopExpenseForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Title</label>
+            <input type="text" id="dt-title" required placeholder="e.g., Groceries" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Amount</label>
+            <input type="number" step="0.01" min="0.01" id="dt-amount" required placeholder="0.00" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Category</label>
+            <select id="dt-category" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+              <option value="Food & Dining">Food & Dining</option>
+              <option value="Groceries">Groceries</option>
+              <option value="Transportation">Transportation</option>
+              <option value="Utilities">Utilities & Bills</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Healthcare">Healthcare</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Date</label>
+            <input type="date" id="dt-date" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition-colors text-sm shadow">Add Expense</button>
+        </form>
+      </div>
+
+      <!-- Content Area: Breakdown + Log -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- Monthly Category Breakdown -->
+        <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 class="text-base sm:text-lg font-bold mb-3 text-slate-800">Monthly Category Breakdown</h3>
+          <div id="categoryBreakdown" class="space-y-3"></div>
+        </div>
+
+        <!-- History Container -->
+        <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-base sm:text-lg font-bold text-slate-800">Expense History</h3>
+            <span id="historySubtitle" class="text-xs text-slate-500"></span>
+          </div>
+
+          <!-- Desktop Table (Visible on sm and up) -->
+          <div class="hidden sm:block overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="border-b border-slate-200 text-xs text-slate-400 uppercase">
+                  <th class="py-2">Date</th>
+                  <th class="py-2">Title</th>
+                  <th class="py-2">Category</th>
+                  <th class="py-2">Amount</th>
+                  <th class="py-2 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="desktopExpenseList" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Cards View (Visible below sm) -->
+          <div id="mobileExpenseList" class="sm:hidden space-y-3"></div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Floating Action Button (FAB) -->
+  <button id="openMobileModalBtn" class="lg:hidden fixed bottom-5 right-5 z-30 bg-indigo-600 active:bg-indigo-700 text-white font-semibold flex items-center gap-2 px-5 py-3.5 rounded-full shadow-lg text-sm transition-transform active:scale-95">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+    Add Expense
+  </button>
+
+  <!-- Mobile Bottom Sheet / Modal -->
+  <div id="mobileModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden flex items-end sm:items-center justify-center transition-opacity">
+    <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-lg font-bold text-slate-800">Add New Expense</h3>
+        <button id="closeMobileModalBtn" class="text-slate-400 text-2xl font-bold hover:text-slate-600">&times;</button>
+      </div>
+      <form id="mobileExpenseForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Title</label>
+          <input type="text" id="mb-title" required placeholder="e.g., Coffee" class="w-full border border-slate-300 rounded-lg p-3 text-base outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Amount</label>
+          <input type="number" step="0.01" min="0.01" id="mb-amount" required placeholder="0.00" class="w-full border border-slate-300 rounded-lg p-3 text-base outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Category</label>
+          <select id="mb-category" class="w-full border border-slate-300 rounded-lg p-3 text-base outline-none bg-white focus:ring-2 focus:ring-indigo-500">
+            <option value="Food & Dining">Food & Dining</option>
+            <option value="Groceries">Groceries</option>
+            <option value="Transportation">Transportation</option>
+            <option value="Utilities">Utilities & Bills</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Date</label>
+          <input type="date" id="mb-date" required class="w-full border border-slate-300 rounded-lg p-3 text-base outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 active:bg-indigo-700 text-white font-semibold py-3.5 rounded-lg text-base shadow">Save Expense</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'daily_monthly_expenses';
+    let expenses = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    // DOM References
+    const desktopMonthFilter = document.getElementById('desktopMonthFilter');
+    const mobileMonthFilter = document.getElementById('mobileMonthFilter');
+    const todayTotalEl = document.getElementById('todayTotal');
+    const mobileTodayTotalEl = document.getElementById('mobileTodayTotal');
+    const monthTotalEl = document.getElementById('monthTotal');
+    const totalEntriesEl = document.getElementById('totalEntries');
+    const categoryBreakdownEl = document.getElementById('categoryBreakdown');
+    const desktopExpenseListEl = document.getElementById('desktopExpenseList');
+    const mobileExpenseListEl = document.getElementById('mobileExpenseList');
+    const historySubtitle = document.getElementById('historySubtitle');
+    const mobileModal = document.getElementById('mobileModal');
+
+    // Date defaults
+    const today = new Date().toISOString().split('T')[0];
+    const currentMonth = today.substring(0, 7);
+    
+    document.getElementById('dt-date').value = today;
+    document.getElementById('mb-date').value = today;
+    desktopMonthFilter.value = currentMonth;
+    mobileMonthFilter.value = currentMonth;
+
+    // Synchronize Filter Inputs
+    desktopMonthFilter.addEventListener('change', (e) => {
+      mobileMonthFilter.value = e.target.value;
+      render();
+    });
+    mobileMonthFilter.addEventListener('change', (e) => {
+      desktopMonthFilter.value = e.target.value;
+      render();
+    });
+
+    // Form Submissions
+    document.getElementById('desktopExpenseForm').addEventListener('submit', (e) => handleFormSubmit(e, 'dt'));
+    document.getElementById('mobileExpenseForm').addEventListener('submit', (e) => {
+      handleFormSubmit(e, 'mb');
+      toggleModal(false);
+    });
+
+    // Modal Controls
+    document.getElementById('openMobileModalBtn').addEventListener('click', () => toggleModal(true));
+    document.getElementById('closeMobileModalBtn').addEventListener('click', () => toggleModal(false));
+
+    function toggleModal(show) {
+      mobileModal.classList.toggle('hidden', !show);
+    }
+
+    function handleFormSubmit(e, prefix) {
+      e.preventDefault();
+      const newExpense = {
+        id: Date.now().toString(),
+        title: document.getElementById(`${prefix}-title`).value.trim(),
+        amount: parseFloat(document.getElementById(`${prefix}-amount`).value),
+        category: document.getElementById(`${prefix}-category`).value,
+        date: document.getElementById(`${prefix}-date`).value
+      };
+
+      expenses.push(newExpense);
+      saveExpenses();
+
+      // Clear Inputs
+      document.getElementById(`${prefix}-title`).value = '';
+      document.getElementById(`${prefix}-amount`).value = '';
+
+      // Set month filter to added item's date
+      const addedMonth = newExpense.date.substring(0, 7);
+      desktopMonthFilter.value = addedMonth;
+      mobileMonthFilter.value = addedMonth;
+
+      render();
+    }
+
+    function deleteExpense(id) {
+      expenses = expenses.filter(exp => exp.id !== id);
+      saveExpenses();
+      render();
+    }
+
+    function saveExpenses() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+    }
+
+    function render() {
+      const selectedMonth = desktopMonthFilter.value;
+      
+      const filtered = expenses
+        .filter(exp => exp.date.startsWith(selectedMonth))
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      const todayTotal = expenses
+        .filter(exp => exp.date === today)
+        .reduce((sum, exp) => sum + exp.amount, 0);
+
+      const monthTotal = filtered.reduce((sum, exp) => sum + exp.amount, 0);
+
+      // Update KPI displays
+      todayTotalEl.textContent = `₹${todayTotal.toFixed(2)}`;
+      mobileTodayTotalEl.textContent = `₹${todayTotal.toFixed(2)}`;
+      monthTotalEl.textContent = `₹${monthTotal.toFixed(2)}`;
+      totalEntriesEl.textContent = filtered.length;
+      historySubtitle.textContent = `Showing ${selectedMonth}`;
+
+      renderCategories(filtered, monthTotal);
+      renderDesktopTable(filtered);
+      renderMobileCards(filtered);
+    }
+
+    function renderCategories(monthlyExpenses, total) {
+      categoryBreakdownEl.innerHTML = '';
+      if (monthlyExpenses.length === 0) {
+        categoryBreakdownEl.innerHTML = `<p class="text-xs sm:text-sm text-slate-400 italic">No expenses recorded for this month.</p>`;
+        return;
+      }
+
+      const categories = {};
+      monthlyExpenses.forEach(exp => {
+        categories[exp.category] = (categories[exp.category] || 0) + exp.amount;
+      });
+
+      Object.keys(categories).forEach(cat => {
+        const catTotal = categories[cat];
+        const percentage = total > 0 ? ((catTotal / total) * 100).toFixed(1) : 0;
+
+        const div = document.createElement('div');
+        div.className = 'space-y-1';
+        div.innerHTML = `
+          <div class="flex justify-between text-xs sm:text-sm">
+            <span class="font-medium text-slate-700">${cat}</span>
+            <span class="text-slate-600 font-semibold">₹${catTotal.toFixed(2)} (${percentage}%)</span>
+          </div>
+          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+            <div class="bg-indigo-500 h-full rounded-full" style="width: ${percentage}%"></div>
+          </div>
+        `;
+        categoryBreakdownEl.appendChild(div);
+      });
+    }
+
+    function renderDesktopTable(filteredExpenses) {
+      desktopExpenseListEl.innerHTML = '';
+      if (filteredExpenses.length === 0) {
+        desktopExpenseListEl.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400 italic">No expenses logged for this month.</td></tr>`;
+        return;
+      }
+
+      filteredExpenses.forEach(exp => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition-colors';
+        tr.innerHTML = `
+          <td class="py-3 text-slate-600 whitespace-nowrap">${exp.date}</td>
+          <td class="py-3 font-medium text-slate-800">${exp.title}</td>
+          <td class="py-3"><span class="px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-full">${exp.category}</span></td>
+          <td class="py-3 font-semibold text-slate-900">₹${exp.amount.toFixed(2)}</td>
+          <td class="py-3 text-right">
+            <button onclick="deleteExpense('${exp.id}')" class="text-rose-500 hover:text-rose-700 text-xs font-semibold px-2 py-1 rounded hover:bg-rose-50">Delete</button>
+          </td>
+        `;
+        desktopExpenseListEl.appendChild(tr);
+      });
+    }
+
+    function renderMobileCards(filteredExpenses) {
+      mobileExpenseListEl.innerHTML = '';
+      if (filteredExpenses.length === 0) {
+        mobileExpenseListEl.innerHTML = `<p class="py-4 text-center text-xs text-slate-400 italic">No expenses logged for this month.</p>`;
+        return;
+      }
+
+      filteredExpenses.forEach(exp => {
+        const card = document.createElement('div');
+        card.className = 'flex justify-between items-center p-3.5 bg-slate-50 border border-slate-100 rounded-lg';
+        card.innerHTML = `
+          <div class="space-y-1">
+            <p class="font-bold text-slate-800 text-sm">${exp.title}</p>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-semibold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">${exp.category}</span>
+              <span class="text-xs text-slate-400">${exp.date}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="font-bold text-slate-900 text-base">₹${exp.amount.toFixed(2)}</span>
+            <button onclick="deleteExpense('${exp.id}')" class="text-rose-500 hover:text-rose-700 p-1">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+          </div>
+        `;
+        mobileExpenseListEl.appendChild(card);
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
