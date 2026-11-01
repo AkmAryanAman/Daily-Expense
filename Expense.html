@@ -229,7 +229,8 @@
         title: document.getElementById(`${prefix}-title`).value.trim(),
         amount: parseFloat(document.getElementById(`${prefix}-amount`).value),
         category: document.getElementById(`${prefix}-category`).value,
-        date: document.getElementById(`${prefix}-date`).value
+        date: document.getElementById(`${prefix}-date`).value,
+        createdAt: new Date().toISOString() // Hidden timestamp saved for exact chronological sorting
       };
 
       expenses.push(newExpense);
@@ -260,9 +261,18 @@
     function render() {
       const selectedMonth = desktopMonthFilter.value;
       
+      // Filter by selected month, then sort by calendar date and exact timestamp
       const filtered = expenses
         .filter(exp => exp.date.startsWith(selectedMonth))
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
+        .sort((a, b) => {
+          if (a.date !== b.date) {
+            return new Date(b.date) - new Date(a.date);
+          }
+          // Same calendar day: newer entry (by hidden createdAt timestamp) appears first
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : Number(a.id);
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : Number(b.id);
+          return timeB - timeA;
+        });
 
       const todayTotal = expenses
         .filter(exp => exp.date === today)
