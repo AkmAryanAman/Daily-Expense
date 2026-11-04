@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="apple-touch-icon" type="image/jpg" size="180x180" href="/budget.jpg">
-  <link rel="icon" type="image/jpg" size="32x32" href="https://akmaryanaman.github.io/Daily-Expense/budget.jpg">
-  <link rel="icon" type="image/jpg" size="16x16" href="https://akmaryanaman.github.io/Daily-Expense/budget.jpg">
+  <link rel="apple-touch-icon" type="image/webp" size="180x180" href="https://akmaryanaman.github.io/Daily-Expense/budget.webp">
+  <link rel="icon" type="image/webp" size="32x32" href="https://akmaryanaman.github.io/Daily-Expense/budget.webp">
+  <link rel="icon" type="image/webp" size="16x16" href="https://akmaryanaman.github.io/Daily-Expense/budget.webp">
   <link rel="manifest" href="https://akmaryanaman.github.io/Daily-Expense/site.webmanifest">
   <meta property="og:url"           content="https://akmaryanaman.github.io/Daily-Expense/index.html" />
   <meta property="og:type"          content="website" />
   <meta property="og:title"         content="Expenses" />
   <meta property="og:description"   content="It Stores Daily Expenses into local browser" />
-  <meta property="og:image"         content="https://akmaryanaman.github.io/Daily-Expense/budget.jpg" />
+  <meta property="og:image"         content="https://akmaryanaman.github.io/Daily-Expense/budget.webp" />
   
   <title>Expenses</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -30,6 +30,9 @@
     </div>
     <div class="flex items-center gap-1.5">
       <input type="month" id="mobileMonthFilter" class="bg-slate-800 border border-slate-700 text-white text-xs rounded p-1 outline-none">
+      <button onclick="openEstimatesModal()" title="Set Estimates" class="p-1.5 text-indigo-300 active:text-white bg-slate-800 rounded border border-slate-700">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+      </button>
       <button onclick="exportData()" title="Backup JSON" class="p-1.5 text-slate-300 active:text-white bg-slate-800 rounded border border-slate-700">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
       </button>
@@ -48,13 +51,17 @@
     <header class="hidden sm:flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-200">
       <div>
         <h1 class="text-2xl font-bold text-slate-900">Expense Tracker</h1>
-        <p class="text-sm text-slate-500">Track daily spending and monthly totals</p>
+        <p class="text-sm text-slate-500">Track daily spending, monthly totals & estimates</p>
       </div>
       <div class="flex items-center gap-2">
         <label for="desktopMonthFilter" class="text-sm font-semibold text-slate-600">Month:</label>
         <input type="month" id="desktopMonthFilter" class="border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mr-2">
         
-        <button onclick="exportData()" title="Backup data to JSON" class="border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-semibold px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5">
+        <button onclick="openEstimatesModal()" title="Set monthly budget estimates" class="border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+          <span>Set Estimates</span>
+        </button>
+        <button onclick="exportData()" title="Backup data to JSON" class="border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
           <span>Backup</span>
         </button>
@@ -104,6 +111,9 @@
             <select id="dt-category" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
               <option value="Food & Dining">Food & Dining</option>
               <option value="Groceries">Groceries</option>
+              <option value="Committed bills">Committed bills</option>
+              <option value="Funds & Savings">Funds & Savings</option>
+              <option value="Loan & EMI">Loan & EMI</option>
               <option value="Transportation">Transportation</option>
               <option value="Utilities">Utilities & Bills</option>
               <option value="Entertainment">Entertainment</option>
@@ -125,8 +135,16 @@
 
         <!-- Monthly Category Breakdown -->
         <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
-          <h3 class="text-base sm:text-lg font-bold mb-3 text-slate-800">Monthly Category Breakdown</h3>
-          <div id="categoryBreakdown" class="space-y-3"></div>
+          <div class="flex justify-between items-center mb-3">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-slate-800">Monthly Expense & Estimates</h3>
+              <p class="text-xs text-slate-400">Shows current spent and % covered against your hidden estimate</p>
+            </div>
+            <button onclick="openEstimatesModal()" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold underline">
+              Edit Estimates
+            </button>
+          </div>
+          <div id="categoryBreakdown" class="space-y-4"></div>
         </div>
 
         <!-- History Container -->
@@ -167,7 +185,7 @@
     Add Expense
   </button>
 
-  <!-- Mobile Bottom Sheet / Modal -->
+  <!-- Mobile Add Expense Modal / Bottom Sheet -->
   <div id="mobileModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden flex items-end sm:items-center justify-center transition-opacity">
     <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
@@ -188,6 +206,9 @@
           <select id="mb-category" class="w-full border border-slate-300 rounded-lg p-3 text-base outline-none bg-white focus:ring-2 focus:ring-indigo-500">
             <option value="Food & Dining">Food & Dining</option>
             <option value="Groceries">Groceries</option>
+            <option value="Committed bills">Committed bills</option>
+            <option value="Funds & Savings">Funds & Savings</option>
+            <option value="Loan & EMI">Loan & EMI</option>
             <option value="Transportation">Transportation</option>
             <option value="Utilities">Utilities & Bills</option>
             <option value="Entertainment">Entertainment</option>
@@ -205,11 +226,66 @@
     </div>
   </div>
 
+  <!-- Estimates Management Modal -->
+  <div id="estimatesModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-xl max-h-[90vh] flex flex-col space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Set Monthly Estimates</h3>
+          <p id="estimatesModalSubtitle" class="text-xs text-slate-500"></p>
+        </div>
+        <button onclick="closeEstimatesModal()" class="text-slate-400 text-2xl font-bold hover:text-slate-600">&times;</button>
+      </div>
+
+      <div class="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
+        Enter the estimated target budget for each category. These amounts will remain hidden on the dashboard; only the percentage covered and your actual expenses will be shown.
+      </div>
+
+      <!-- Form for Categories -->
+      <form id="estimatesForm" onsubmit="saveEstimates(event)" class="flex flex-col flex-1 overflow-hidden">
+        <!-- Scrollable Category List -->
+        <div id="estimatesInputsContainer" class="space-y-3 overflow-y-auto pr-1 flex-1 max-h-[45vh]">
+          <!-- Dynamically populated per category -->
+        </div>
+
+        <!-- End of Form Summary: Total Estimated Amount -->
+        <div class="mt-4 pt-3 border-t border-slate-200">
+          <div class="flex justify-between items-center bg-indigo-50 border border-indigo-100 rounded-xl p-3.5 mb-3">
+            <span class="text-sm font-semibold text-indigo-900">Total Estimated Amount:</span>
+            <span id="modalTotalEstimated" class="text-lg font-bold text-indigo-700">₹0.00</span>
+          </div>
+
+          <div class="flex justify-end gap-2">
+            <button type="button" onclick="closeEstimatesModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-600 hover:bg-slate-50 font-medium">Cancel</button>
+            <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm shadow">OK & Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     const PATH_PREFIX = window.location.pathname.replace(/\/index\.html?$/i, '').replace(/\/$/, '') || '/root';
-    const STORAGE_KEY = `expense_app_${PATH_PREFIX}_data`;
+    const EXPENSES_STORAGE_KEY = `expense_app_${PATH_PREFIX}_data`;
+    const ESTIMATES_STORAGE_KEY = `expense_app_${PATH_PREFIX}_estimates`;
 
-    let expenses = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    // Updated categories including "Committed bills", "Funds & Savings", and "Loan & EMI"
+    const CATEGORIES = [
+      "Food & Dining",
+      "Groceries",
+      "Committed bills",
+      "Funds & Savings",
+      "Loan & EMI",
+      "Transportation",
+      "Utilities",
+      "Entertainment",
+      "Shopping",
+      "Healthcare",
+      "Other"
+    ];
+
+    let expenses = JSON.parse(localStorage.getItem(EXPENSES_STORAGE_KEY)) || [];
+    let monthlyEstimates = JSON.parse(localStorage.getItem(ESTIMATES_STORAGE_KEY)) || {};
 
     // DOM References
     const desktopMonthFilter = document.getElementById('desktopMonthFilter');
@@ -223,9 +299,22 @@
     const mobileExpenseListEl = document.getElementById('mobileExpenseList');
     const historySubtitle = document.getElementById('historySubtitle');
     const mobileModal = document.getElementById('mobileModal');
+    const estimatesModal = document.getElementById('estimatesModal');
+    const estimatesModalSubtitle = document.getElementById('estimatesModalSubtitle');
+    const estimatesInputsContainer = document.getElementById('estimatesInputsContainer');
+    const modalTotalEstimated = document.getElementById('modalTotalEstimated');
 
-    // Date defaults
-    const today = new Date().toISOString().split('T')[0];
+    // Helper: format date as YYYY-MM-DD
+    function getTodayDateString() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Initialize auto-selected date to today
+    const today = getTodayDateString();
     const currentMonth = today.substring(0, 7);
     
     document.getElementById('dt-date').value = today;
@@ -250,30 +339,111 @@
       toggleModal(false);
     });
 
-    // Modal Controls
-    document.getElementById('openMobileModalBtn').addEventListener('click', () => toggleModal(true));
+    // Mobile Modal Controls
+    document.getElementById('openMobileModalBtn').addEventListener('click', () => {
+      // Re-default to today when opening modal if empty
+      if (!document.getElementById('mb-date').value) {
+        document.getElementById('mb-date').value = getTodayDateString();
+      }
+      toggleModal(true);
+    });
     document.getElementById('closeMobileModalBtn').addEventListener('click', () => toggleModal(false));
 
     function toggleModal(show) {
       mobileModal.classList.toggle('hidden', !show);
     }
 
+    // Dynamic Live Sum for Modal Form
+    function updateModalTotalEstimate() {
+      const inputs = estimatesInputsContainer.querySelectorAll('input[data-category]');
+      let sum = 0;
+      inputs.forEach(input => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val) && val > 0) {
+          sum += val;
+        }
+      });
+      modalTotalEstimated.textContent = `₹${sum.toFixed(2)}`;
+    }
+
+    // Estimates Modal Controls
+    function openEstimatesModal() {
+      const selectedMonth = desktopMonthFilter.value;
+      estimatesModalSubtitle.textContent = `Configuring estimates for ${selectedMonth}`;
+      
+      const currentMonthEst = monthlyEstimates[selectedMonth] || {};
+      estimatesInputsContainer.innerHTML = '';
+
+      CATEGORIES.forEach(cat => {
+        const val = currentMonthEst[cat] !== undefined ? currentMonthEst[cat] : '';
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between gap-4 p-2.5 bg-slate-50 rounded-lg border border-slate-200';
+        row.innerHTML = `
+          <label class="text-sm font-semibold text-slate-700 flex-1">${cat}</label>
+          <div class="relative w-36">
+            <span class="absolute left-2.5 top-2 text-sm text-slate-400">₹</span>
+            <input type="number" step="0.01" min="0" data-category="${cat}" value="${val}" placeholder="0.00" class="w-full pl-6 pr-2 py-1.5 border border-slate-300 rounded text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        `;
+        estimatesInputsContainer.appendChild(row);
+      });
+
+      // Bind input events for live totaling
+      estimatesInputsContainer.querySelectorAll('input[data-category]').forEach(input => {
+        input.addEventListener('input', updateModalTotalEstimate);
+      });
+
+      updateModalTotalEstimate();
+      estimatesModal.classList.remove('hidden');
+    }
+
+    function closeEstimatesModal() {
+      estimatesModal.classList.add('hidden');
+    }
+
+    function saveEstimates(e) {
+      e.preventDefault();
+      const selectedMonth = desktopMonthFilter.value;
+      const inputs = estimatesInputsContainer.querySelectorAll('input[data-category]');
+
+      if (!monthlyEstimates[selectedMonth]) {
+        monthlyEstimates[selectedMonth] = {};
+      }
+
+      inputs.forEach(input => {
+        const cat = input.dataset.category;
+        const val = parseFloat(input.value);
+        if (!isNaN(val) && val > 0) {
+          monthlyEstimates[selectedMonth][cat] = val;
+        } else {
+          delete monthlyEstimates[selectedMonth][cat];
+        }
+      });
+
+      saveEstimatesToStorage();
+      closeEstimatesModal();
+      render();
+    }
+
     function handleFormSubmit(e, prefix) {
       e.preventDefault();
+      const enteredDate = document.getElementById(`${prefix}-date`).value || getTodayDateString();
       const newExpense = {
         id: Date.now().toString(),
         title: document.getElementById(`${prefix}-title`).value.trim(),
         amount: parseFloat(document.getElementById(`${prefix}-amount`).value),
         category: document.getElementById(`${prefix}-category`).value,
-        date: document.getElementById(`${prefix}-date`).value,
+        date: enteredDate,
         createdAt: new Date().toISOString()
       };
 
       expenses.push(newExpense);
       saveExpenses();
 
+      // Clear text/amount inputs and reset date auto-select back to today
       document.getElementById(`${prefix}-title`).value = '';
       document.getElementById(`${prefix}-amount`).value = '';
+      document.getElementById(`${prefix}-date`).value = getTodayDateString();
 
       const addedMonth = newExpense.date.substring(0, 7);
       desktopMonthFilter.value = addedMonth;
@@ -289,24 +459,27 @@
     }
 
     function clearAppData() {
-      if (confirm("Are you sure you want to clear all data for this expense tracker? Other applications will not be affected.")) {
-        localStorage.removeItem(STORAGE_KEY);
+      if (confirm("Are you sure you want to clear all data and estimates for this expense tracker?")) {
+        localStorage.removeItem(EXPENSES_STORAGE_KEY);
+        localStorage.removeItem(ESTIMATES_STORAGE_KEY);
         expenses = [];
+        monthlyEstimates = {};
         render();
       }
     }
 
     function exportData() {
-      if (expenses.length === 0) {
-        alert("No expenses recorded to backup.");
+      if (expenses.length === 0 && Object.keys(monthlyEstimates).length === 0) {
+        alert("No expenses or estimates recorded to backup.");
         return;
       }
 
       const exportPayload = {
-        version: 1,
+        version: 2,
         exportedAt: new Date().toISOString(),
         pathPrefix: PATH_PREFIX,
-        data: expenses
+        expenses: expenses,
+        estimates: monthlyEstimates
       };
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
@@ -334,33 +507,40 @@
       reader.onload = function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
-          const importedData = Array.isArray(parsed) ? parsed : (parsed.data || null);
+          
+          let importedExpenses = [];
+          let importedEstimates = {};
 
-          if (!Array.isArray(importedData)) {
-            throw new Error("Invalid file structure: Expected an array of expenses.");
+          if (Array.isArray(parsed)) {
+            importedExpenses = parsed;
+          } else if (parsed.expenses || parsed.data) {
+            importedExpenses = parsed.expenses || parsed.data || [];
+            importedEstimates = parsed.estimates || {};
           }
 
-          const isValid = importedData.every(item => 
-            item && typeof item === 'object' && item.title && item.amount !== undefined && item.date
-          );
-
-          if (!isValid) {
-            throw new Error("Data is missing required properties (title, amount, or date).");
+          if (!Array.isArray(importedExpenses)) {
+            throw new Error("Invalid structure: Expected expense records.");
           }
 
           const replaceExisting = confirm(
-            `Found ${importedData.length} records.\n\nClick OK to REPLACE your current records, or CANCEL to MERGE with existing records.`
+            `Found ${importedExpenses.length} expense records.\n\nClick OK to REPLACE your current records & estimates, or CANCEL to MERGE.`
           );
 
           if (replaceExisting) {
-            expenses = importedData;
+            expenses = importedExpenses;
+            monthlyEstimates = importedEstimates;
           } else {
             const existingIds = new Set(expenses.map(exp => exp.id));
-            const newRecords = importedData.filter(exp => !existingIds.has(exp.id));
+            const newRecords = importedExpenses.filter(exp => !existingIds.has(exp.id));
             expenses = [...expenses, ...newRecords];
+            
+            Object.keys(importedEstimates).forEach(m => {
+              monthlyEstimates[m] = { ...(monthlyEstimates[m] || {}), ...importedEstimates[m] };
+            });
           }
 
           saveExpenses();
+          saveEstimatesToStorage();
           render();
           alert("Data restored successfully!");
         } catch (err) {
@@ -372,7 +552,11 @@
     }
 
     function saveExpenses() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+      localStorage.setItem(EXPENSES_STORAGE_KEY, JSON.stringify(expenses));
+    }
+
+    function saveEstimatesToStorage() {
+      localStorage.setItem(ESTIMATES_STORAGE_KEY, JSON.stringify(monthlyEstimates));
     }
 
     function render() {
@@ -389,8 +573,9 @@
           return timeB - timeA;
         });
 
+      const todayStr = getTodayDateString();
       const todayTotal = expenses
-        .filter(exp => exp.date === today)
+        .filter(exp => exp.date === todayStr)
         .reduce((sum, exp) => sum + exp.amount, 0);
 
       const monthTotal = filtered.reduce((sum, exp) => sum + exp.amount, 0);
@@ -401,36 +586,67 @@
       totalEntriesEl.textContent = filtered.length;
       historySubtitle.textContent = `Showing ${selectedMonth}`;
 
-      renderCategories(filtered, monthTotal);
+      renderCategories(filtered, selectedMonth, monthTotal);
       renderDesktopTable(filtered);
       renderMobileCards(filtered);
     }
 
-    function renderCategories(monthlyExpenses, total) {
+    function renderCategories(monthlyExpenses, selectedMonth, totalMonthExpense) {
       categoryBreakdownEl.innerHTML = '';
-      if (monthlyExpenses.length === 0) {
-        categoryBreakdownEl.innerHTML = `<p class="text-xs sm:text-sm text-slate-400 italic">No expenses recorded for this month.</p>`;
+      const currentEstimates = monthlyEstimates[selectedMonth] || {};
+
+      const actualSpent = {};
+      monthlyExpenses.forEach(exp => {
+        actualSpent[exp.category] = (actualSpent[exp.category] || 0) + exp.amount;
+      });
+
+      const activeCategories = Array.from(new Set([
+        ...Object.keys(actualSpent),
+        ...Object.keys(currentEstimates)
+      ]));
+
+      if (activeCategories.length === 0) {
+        categoryBreakdownEl.innerHTML = `<p class="text-xs sm:text-sm text-slate-400 italic">No expenses or estimates recorded for this month.</p>`;
         return;
       }
 
-      const categories = {};
-      monthlyExpenses.forEach(exp => {
-        categories[exp.category] = (categories[exp.category] || 0) + exp.amount;
-      });
+      activeCategories.forEach(cat => {
+        const spent = actualSpent[cat] || 0;
+        const estimate = currentEstimates[cat];
+        
+        let labelText = '';
+        let barPercentage = 0;
+        let barColor = 'bg-indigo-500';
 
-      Object.keys(categories).forEach(cat => {
-        const catTotal = categories[cat];
-        const percentage = total > 0 ? ((catTotal / total) * 100).toFixed(1) : 0;
+        if (estimate && estimate > 0) {
+          const coveredRatio = (spent / estimate) * 100;
+          labelText = `₹${spent.toFixed(2)} (${coveredRatio.toFixed(1)}% covered)`;
+          barPercentage = Math.min(coveredRatio, 100);
+
+          if (coveredRatio > 100) {
+            barColor = 'bg-rose-500';
+            labelText = `₹${spent.toFixed(2)} (${coveredRatio.toFixed(1)}% - Over Estimate)`;
+          } else if (coveredRatio >= 85) {
+            barColor = 'bg-amber-500';
+          }
+        } else {
+          const share = totalMonthExpense > 0 ? ((spent / totalMonthExpense) * 100).toFixed(1) : 0;
+          labelText = `₹${spent.toFixed(2)} (${share}% of month)`;
+          barPercentage = share;
+        }
 
         const div = document.createElement('div');
-        div.className = 'space-y-1';
+        div.className = 'space-y-1.5';
         div.innerHTML = `
-          <div class="flex justify-between text-xs sm:text-sm">
-            <span class="font-medium text-slate-700">${cat}</span>
-            <span class="text-slate-600 font-semibold">₹${catTotal.toFixed(2)} (${percentage}%)</span>
+          <div class="flex justify-between items-center text-xs sm:text-sm">
+            <span class="font-medium text-slate-700 flex items-center gap-1.5">
+              ${cat}
+              ${estimate ? '<span class="text-[10px] bg-indigo-50 text-indigo-600 font-semibold px-1.5 py-0.5 rounded border border-indigo-100">Estimated</span>' : ''}
+            </span>
+            <span class="text-slate-600 font-semibold">${labelText}</span>
           </div>
-          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-            <div class="bg-indigo-500 h-full rounded-full" style="width: ${percentage}%"></div>
+          <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+            <div class="${barColor} h-full rounded-full transition-all duration-300" style="width: ${barPercentage}%"></div>
           </div>
         `;
         categoryBreakdownEl.appendChild(div);
